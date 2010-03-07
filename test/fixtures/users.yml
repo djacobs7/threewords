@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  snid: 1
+  gender: 1
+  likes: 1
+
+two:
+  snid: 1
+  gender: 1
+  likes: 1

@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+
+<head>
+  <title> 3 Words </title>
+  <%= javascript_include_tag "jquery-1.4.2.min" -%>
+  <%= javascript_include_tag "jquery-ui-1.8rc3.custom.min" -%>
+</head>
+<body>
+  
+<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script>
+<fb:login-button onlogin="facebook_onlogin();"></fb:login-button>
+
+<style>
+  
+
+
+</style>
+<script type="text/javascript">
+
+    FB.init("<%=  facebook_api_key -%>", "xd_receiver.htm");
+
+    $(document).ready(function(){
+      
+      
+      $("#describe_me_button").click(function() { 
+        describe_me_button();
+        
+
+        return false;
+      });  
+      
+      $("#describe_you_button").click(function() { 
+        
+        describe_you_button();
+        return false;
+      });  
+    });
+    
+
+    function describe_you_button()
+    {
+      var word_1 = $("input#word_1_you").val();
+      var word_2 = $("input#word_2_you").val();
+      var word_3 = $("input#word_3_you").val();
+      var likes = $("input#likes").val();
+
+
+      
+      
+          $.post( "words/show", //Ajax file
+            { word_1: word_1, word_2: word_2, word_3: word_3, likes: likes },
+            //function that is called when server returns a value.
+            function(data){
+              
+              $("#describe_you_button").attr('enabled', 'enabled');
+              alert( data );
+              
+              find_matches(data);
+
+
+
+
+              $('#display').html(data.returnValue);
+            }, 
+            "json"            
+          );
+      
+    }
+    
+    function find_matches(data)
+    {
+      snids = data.map( function( user ){ return user['user']['snid']  } );
+      FB.Facebook.apiClient.users_getInfo(snids,  ['pic_square', 'sex'], 
+        function( result )
+        {
+          alert( result );
+        }
+      
+      
+      );
+    }
+    
+    function describe_me_button()
+    {
+      
+        FB.Connect.requireSession( function(){
+          var word_1 = $("input#word_1_me").val();
+          var word_2 = $("input#word_2_me").val();
+          var word_3 = $("input#word_3_me").val();
+          var gender = $("input#gender").val();
+          var likes = $("input#likes").val();
+
+
+          var snid = FB.Connect.get_loggedInUser();
+
+      
+          $.post( "/users/create", //Ajax file
+            { word_1: word_1, word_2: word_2, word_3: word_3, likes: likes, gender: gender, snid: snid },
+            //function that is called when server returns a value.
+            function(data){
+              
+              $("#describe_me_button").attr('enabled', 'enabled');
+              $('#display').html(data.returnValue);
+            }, 
+            "json"            
+          );
+        },
+        function(){
+            alert('you must log into facebook');
+          },
+          true
+        );
+    }
+    
+    function facebook_onlogin() {
+        // Do something here...
+        
+        
+
+        snid = FB.Connect.get_loggedInUser();
+        alert(snid);
+      }        
+        
+        
+        </script>
+
+
+
+<h2>Tell us who you would like to find.<h2>
+<div id="describe_you_form">
+  <% form_tag  do %>
+    <%= text_field_tag :word_1_you, 'describe' %>
+    <%= text_field_tag :word_2_you, 'yourself' %>
+    <%= text_field_tag :word_3_you, 'here' %>
+    <%= submit_tag :find, :id => :describe_you_button %>
+  <% end %>
+</div>
+
+<h2>We would love it if you told us about yourself.<h2> <h3>  Seriously, just a little bit: </h3>
+  <br/>
+  <h3> Either signup or Login </h3>
+<div id="describe_me_form">
+  <% form_tag  do %>
+    <%= text_field_tag :word_1_me, 'describe' %>
+    <%= text_field_tag :word_2_me, 'yourself' %>
+    <%= text_field_tag :word_3_me, 'here' %>
+    <%= label_tag :i_am_a %>
+    <%= label_tag :girl %>
+    <%= radio_button_tag 'gender', "#{User::FEMALE}" %>
+    <%= label_tag :boy %>
+    <%= radio_button_tag 'gender', "#{User::MALE}" %>
+
+    <%= label_tag :i_like %>
+    <%= label_tag :girls %>
+    <%= radio_button_tag 'likes', "#{User::FEMALE}" %>
+    <%= label_tag :boys %>
+    <%= radio_button_tag 'likes', "#{User::MALE}" %>
+    <%= label_tag :both %>
+    <%= radio_button_tag 'likes', "#{User::BOTH}" %>
+
+
+    <%= submit_tag :thats_me, :id => :describe_me_button %>
+  <% end %>
+</div>
+
+
+</body>
+</html>
