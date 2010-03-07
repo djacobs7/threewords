@@ -6,6 +6,9 @@
   <title> 3 Words </title>
   <%= javascript_include_tag "jquery-1.4.2.min" -%>
   <%= javascript_include_tag "jquery-ui-1.8rc3.custom.min" -%>
+  <%= stylesheet_link_tag "jquery-ui-1.8rc3.custom" -%>
+  
+  
 </head>
 <body>
   
@@ -36,6 +39,8 @@
         describe_you_button();
         return false;
       });  
+      
+      $("#matches_list").hide();
     });
     
 
@@ -71,11 +76,16 @@
     
     function find_matches(data)
     {
-      snids = data.map( function( user ){ return user['user']['snid']  } );
+      snids = data.map( function( user ){ return user['user']['snid']; } );
       FB.Facebook.apiClient.users_getInfo(snids,  ['pic_square', 'sex'], 
         function( result )
         {
           alert( result );
+          
+          inner_list = result.map( function( obj ){ return "<li> <img src="+ obj['pic_square'] +"></img> </li>";} ).join("\n"); 
+          
+          $("#matches_list").append( "<ul>" + inner_list + "</ul>" );
+          $("#matches_list").show('drop');
         }
       
       
@@ -127,6 +137,13 @@
         </script>
 
 
+
+<div id="matches_list" class="ui-widget-content ui-corner-all">
+		<h3 class="ui-widget-header ui-corner-all">Matches</h3>
+		<p>
+			Etiam libero neque, luctus a, eleifend nec, semper at, lorem. Sed pede. Nulla lorem metus, adipiscing ut, luctus sed, hendrerit vitae, mi.
+		</p>
+</div>
 
 <h2>Tell us who you would like to find.<h2>
 <div id="describe_you_form">
